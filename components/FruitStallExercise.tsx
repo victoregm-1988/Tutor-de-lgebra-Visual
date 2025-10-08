@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Difficulty, EquationProblem } from '../types';
 
-const FruitStallExercise: React.FC = () => {
-  const [difficulty, setDifficulty] = useState<Difficulty>(Difficulty.EASY);
+interface FruitStallExerciseProps {
+  difficulty: Difficulty;
+  onCorrectAnswer: () => void;
+  onDifficultyChange: (newDifficulty: Difficulty) => void;
+}
+
+const FruitStallExercise: React.FC<FruitStallExerciseProps> = ({ difficulty, onCorrectAnswer, onDifficultyChange }) => {
   const [problem, setProblem] = useState<EquationProblem | null>(null);
   const [userInput, setUserInput] = useState<string>('');
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
@@ -46,6 +51,7 @@ const FruitStallExercise: React.FC = () => {
   const handleCheckAnswer = () => {
     if (problem && parseInt(userInput, 10) === problem.solution) {
       setFeedback('correct');
+      onCorrectAnswer();
       timeoutRef.current = window.setTimeout(() => {
         generateProblem();
       }, 2000);
@@ -76,7 +82,7 @@ const FruitStallExercise: React.FC = () => {
             if (timeoutRef.current) {
               clearTimeout(timeoutRef.current);
             }
-            setDifficulty(level);
+            onDifficultyChange(level);
           }} className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${difficulty === level ? 'bg-red-500 text-white shadow' : 'bg-red-100 text-red-800 hover:bg-red-200'}`}>
             {level}
           </button>

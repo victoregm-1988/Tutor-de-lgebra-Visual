@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Difficulty, EquationProblem } from '../types';
 
-const FieldPerimeterExercise: React.FC = () => {
-  const [difficulty, setDifficulty] = useState<Difficulty>(Difficulty.EASY);
+interface FieldPerimeterExerciseProps {
+  difficulty: Difficulty;
+  onCorrectAnswer: () => void;
+  onDifficultyChange: (newDifficulty: Difficulty) => void;
+}
+
+const FieldPerimeterExercise: React.FC<FieldPerimeterExerciseProps> = ({ difficulty, onCorrectAnswer, onDifficultyChange }) => {
   const [problem, setProblem] = useState<EquationProblem | null>(null);
   const [userInput, setUserInput] = useState<string>('');
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
@@ -47,6 +52,7 @@ const FieldPerimeterExercise: React.FC = () => {
   const handleCheckAnswer = () => {
     if (problem && parseInt(userInput, 10) === problem.solution) {
       setFeedback('correct');
+      onCorrectAnswer();
       timeoutRef.current = window.setTimeout(() => {
         generateProblem();
       }, 2000);
@@ -77,7 +83,7 @@ const FieldPerimeterExercise: React.FC = () => {
             if (timeoutRef.current) {
               clearTimeout(timeoutRef.current);
             }
-            setDifficulty(level);
+            onDifficultyChange(level);
           }} className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${difficulty === level ? 'bg-lime-600 text-white shadow' : 'bg-lime-100 text-lime-800 hover:bg-lime-200'}`}>
             {level}
           </button>

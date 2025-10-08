@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Difficulty, EquationProblem } from '../types';
 
-const BalanceScaleExercise: React.FC = () => {
-  const [difficulty, setDifficulty] = useState<Difficulty>(Difficulty.EASY);
+interface BalanceScaleExerciseProps {
+  difficulty: Difficulty;
+  onCorrectAnswer: () => void;
+  onDifficultyChange: (newDifficulty: Difficulty) => void;
+}
+
+const BalanceScaleExercise: React.FC<BalanceScaleExerciseProps> = ({ difficulty, onCorrectAnswer, onDifficultyChange }) => {
   const [problem, setProblem] = useState<EquationProblem | null>(null);
   const [userInput, setUserInput] = useState<string>('');
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
@@ -46,6 +51,7 @@ const BalanceScaleExercise: React.FC = () => {
   const handleCheckAnswer = () => {
     if (problem && parseInt(userInput, 10) === problem.solution) {
       setFeedback('correct');
+      onCorrectAnswer();
       timeoutRef.current = window.setTimeout(() => {
         generateProblem();
       }, 2000);
@@ -76,7 +82,7 @@ const BalanceScaleExercise: React.FC = () => {
             if (timeoutRef.current) {
               clearTimeout(timeoutRef.current);
             }
-            setDifficulty(level);
+            onDifficultyChange(level);
           }} className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${difficulty === level ? 'bg-amber-500 text-white shadow' : 'bg-amber-100 text-amber-800 hover:bg-amber-200'}`}>
             {level}
           </button>

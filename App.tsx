@@ -2,8 +2,14 @@ import React, { useState } from 'react';
 import BalanceScaleExercise from './components/BalanceScaleExercise';
 import FieldPerimeterExercise from './components/FieldPerimeterExercise';
 import FruitStallExercise from './components/FruitStallExercise';
+import { Difficulty } from './types';
 
 type Exercise = 'balance' | 'perimeter' | 'fruits';
+
+interface ExerciseProgress {
+  difficulty: Difficulty;
+  correctStreak: number;
+}
 
 const TABS: { id: Exercise; name: string; icon: string }[] = [
     { id: 'balance', name: 'Balança', icon: '⚖️' },
@@ -11,19 +17,71 @@ const TABS: { id: Exercise; name: string; icon: string }[] = [
     { id: 'fruits', name: 'Feira', icon: '🍎' },
 ];
 
+const DIFFICULTY_ORDER = [Difficulty.EASY, Difficulty.MEDIUM, Difficulty.DIFFICULT];
+
 const App: React.FC = () => {
   const [currentExercise, setCurrentExercise] = useState<Exercise>('balance');
+  const [progress, setProgress] = useState<Record<Exercise, ExerciseProgress>>({
+    balance: { difficulty: Difficulty.EASY, correctStreak: 0 },
+    perimeter: { difficulty: Difficulty.EASY, correctStreak: 0 },
+    fruits: { difficulty: Difficulty.EASY, correctStreak: 0 },
+  });
+
+  const handleCorrectAnswer = () => {
+    const currentProgress = progress[currentExercise];
+    const newStreak = currentProgress.correctStreak + 1;
+
+    if (newStreak >= 5) {
+      const currentDifficultyIndex = DIFFICULTY_ORDER.indexOf(currentProgress.difficulty);
+      
+      if (currentDifficultyIndex === DIFFICULTY_ORDER.length - 1) { // Is 'Difícil'
+        const currentTabIndex = TABS.findIndex(tab => tab.id === currentExercise);
+        const nextTabIndex = (currentTabIndex + 1) % TABS.length;
+        setCurrentExercise(TABS[nextTabIndex].id);
+        
+        // Reset streak for the exercise we are leaving
+        setProgress(prev => ({
+          ...prev,
+          [currentExercise]: { ...prev[currentExercise], correctStreak: 0 }
+        }));
+      } else { // Not the highest difficulty, so level up
+        const nextDifficulty = DIFFICULTY_ORDER[currentDifficultyIndex + 1];
+        setProgress(prev => ({
+          ...prev,
+          [currentExercise]: { difficulty: nextDifficulty, correctStreak: 0 }
+        }));
+      }
+    } else { // Streak is not yet 5, just increment
+      setProgress(prev => ({
+        ...prev,
+        [currentExercise]: { ...prev[currentExercise], correctStreak: newStreak }
+      }));
+    }
+  };
+  
+  const handleDifficultyChange = (newDifficulty: Difficulty) => {
+    setProgress(prev => ({
+        ...prev,
+        [currentExercise]: { difficulty: newDifficulty, correctStreak: 0 }
+    }));
+  };
 
   const renderExercise = () => {
+    const props = {
+      difficulty: progress[currentExercise].difficulty,
+      onCorrectAnswer: handleCorrectAnswer,
+      onDifficultyChange: handleDifficultyChange,
+    };
+
     switch (currentExercise) {
       case 'balance':
-        return <BalanceScaleExercise />;
+        return <BalanceScaleExercise {...props} />;
       case 'perimeter':
-        return <FieldPerimeterExercise />;
+        return <FieldPerimeterExercise {...props} />;
       case 'fruits':
-        return <FruitStallExercise />;
+        return <FruitStallExercise {...props} />;
       default:
-        return <BalanceScaleExercise />;
+        return <BalanceScaleExercise {...props} />;
     }
   };
 
@@ -57,6 +115,10 @@ const App: React.FC = () => {
           ))}
         </div>
         
+        <div className="text-center mb-4 text-gray-600 bg-white/50 rounded-lg p-2 border">
+            <p className="font-semibold">Nível Atual: <span className="font-bold text-green-700">{progress[currentExercise].difficulty}</span> | Acertos seguidos: <span className="font-bold text-green-700">{progress[currentExercise].correctStreak} / 5</span></p>
+        </div>
+
         <main>
           {renderExercise()}
         </main>
