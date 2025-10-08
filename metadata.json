@@ -1,0 +1,5 @@
+{
+  "name": "Tutor de Álgebra Visual",
+  "description": "Uma aplicação interativa para ajudar alunos a resolver equações de 1º grau (ax+b=c) com exemplos visuais e práticos, ideal para um ambiente de aprendizado cinestésico e para escolas do campo.",
+  "requestFramePermissions": []
+}
