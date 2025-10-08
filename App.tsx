@@ -3,6 +3,7 @@ import BalanceScaleExercise from './components/BalanceScaleExercise';
 import FieldPerimeterExercise from './components/FieldPerimeterExercise';
 import FruitStallExercise from './components/FruitStallExercise';
 import { Difficulty } from './types';
+import ExplanationModal from './components/ExplanationModal';
 
 type Exercise = 'balance' | 'perimeter' | 'fruits';
 
@@ -21,6 +22,7 @@ const DIFFICULTY_ORDER = [Difficulty.EASY, Difficulty.MEDIUM, Difficulty.DIFFICU
 
 const App: React.FC = () => {
   const [currentExercise, setCurrentExercise] = useState<Exercise>('balance');
+  const [isExplanationVisible, setIsExplanationVisible] = useState(false);
   const [progress, setProgress] = useState<Record<Exercise, ExerciseProgress>>({
     balance: { difficulty: Difficulty.EASY, correctStreak: 0 },
     perimeter: { difficulty: Difficulty.EASY, correctStreak: 0 },
@@ -88,13 +90,21 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-green-50/50 font-sans p-4 sm:p-6 text-slate-800">
       <div className="max-w-5xl mx-auto">
-        <header className="text-center mb-6">
+        <header className="text-center mb-6 relative">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-green-800 mb-2">
             Tutor de Álgebra Visual
           </h1>
           <p className="text-base sm:text-lg text-green-700">
             Resolva equações da forma <span className="font-mono font-semibold bg-green-100 px-2 py-1 rounded">ax + b = c</span> de maneira prática e divertida!
           </p>
+          <button
+            onClick={() => setIsExplanationVisible(true)}
+            className="absolute top-0 right-0 mt-2 mr-0 sm:mr-2 flex items-center gap-2 bg-blue-100 text-blue-800 font-semibold px-3 sm:px-4 py-2 rounded-full shadow-sm hover:bg-blue-200 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            aria-label="Mostrar explicação de como resolver as equações"
+          >
+            <span className="text-xl">💡</span>
+            <span className="hidden sm:inline">Explicação</span>
+          </button>
         </header>
         
         <div className="flex justify-center border-b-2 border-green-200 mb-6" aria-label="Navegação de exercícios">
@@ -127,6 +137,7 @@ const App: React.FC = () => {
           <p>Criado para inspirar o aprendizado da matemática no campo.</p>
         </footer>
       </div>
+      {isExplanationVisible && <ExplanationModal onClose={() => setIsExplanationVisible(false)} />}
     </div>
   );
 };
