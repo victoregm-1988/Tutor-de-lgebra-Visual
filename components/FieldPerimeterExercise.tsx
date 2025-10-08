@@ -108,7 +108,10 @@ const FieldPerimeterExercise: React.FC<FieldPerimeterExerciseProps> = ({ difficu
             <input 
               type="number"
               value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
+              onChange={(e) => {
+                setUserInput(e.target.value);
+                if (feedback) setFeedback(null);
+              }}
               onKeyDown={(e) => e.key === 'Enter' && handleCheckAnswer()}
               disabled={feedback === 'correct'}
               className="w-24 text-center text-lg p-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-lime-500 focus:border-lime-500 transition"
@@ -130,6 +133,42 @@ const FieldPerimeterExercise: React.FC<FieldPerimeterExerciseProps> = ({ difficu
       {feedback && (
         <div className={`mt-4 text-center text-lg font-semibold p-3 rounded-lg ${feedback === 'correct' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
           {feedback === 'correct' ? 'Ótimo trabalho! Terreno medido corretamente!' : 'Quase lá! Verifique seus cálculos.'}
+        </div>
+      )}
+
+      {feedback === 'incorrect' && problem && (
+        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-left text-sm text-slate-700">
+          <h3 className="font-bold text-base text-blue-700 mb-2">💡 Passo a passo para cercar o terreno!</h3>
+          <p className="mb-2">A cerca cobre três lados do terreno. O total da cerca é a soma desses três lados.</p>
+          <ol className="list-decimal list-inside space-y-2">
+            <li>
+              <strong>Equação do Perímetro:</strong> Somando os lados que precisam de cerca, temos:
+              <br />
+              <code className="bg-blue-100 p-1 rounded font-mono">x + x + {problem.b} = {problem.c}</code>
+              <br />
+              O que simplifica para:
+              <br />
+              <code className="bg-blue-100 p-1 rounded font-mono">2x + {problem.b} = {problem.c}</code>
+            </li>
+            <li>
+              <strong>Isolar os lados 'x':</strong> O total da cerca é <span className="font-bold">{problem.c}m</span>. Se tirarmos o lado conhecido de <span className="font-bold">{problem.b}m</span>, descobrimos quanto de cerca sobra para os dois lados 'x'.
+              <br />
+              <code className="bg-blue-100 p-1 rounded font-mono">{problem.c} - {problem.b} = {problem.c - problem.b}</code>
+            </li>
+            <li>
+              <strong>Equação Simplificada:</strong> Agora sabemos que os dois lados 'x' juntos medem <span className="font-bold">{problem.c - problem.b}m</span>.
+              <br />
+              <code className="bg-blue-100 p-1 rounded font-mono">2x = {problem.c - problem.b}</code>
+            </li>
+            <li>
+              <strong>Descobrir o valor de um 'x':</strong> Se os dois lados 'x' somam <span className="font-bold">{problem.c - problem.b}m</span>, dividimos por 2 para achar o comprimento de um lado só.
+              <br />
+              <code className="bg-blue-100 p-1 rounded font-mono">{problem.c - problem.b} / 2 = {problem.solution}</code>
+            </li>
+            <li>
+              <strong>Resposta:</strong> Cada lado 'x' mede <span className="font-bold">{problem.solution}</span> metros.
+            </li>
+          </ol>
         </div>
       )}
     </div>

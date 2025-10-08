@@ -131,7 +131,10 @@ const BalanceScaleExercise: React.FC<BalanceScaleExerciseProps> = ({ difficulty,
             <input 
               type="number"
               value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
+              onChange={(e) => {
+                setUserInput(e.target.value);
+                if (feedback) setFeedback(null);
+              }}
               onKeyDown={(e) => e.key === 'Enter' && handleCheckAnswer()}
               disabled={feedback === 'correct'}
               className="w-24 text-center text-lg p-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition"
@@ -152,6 +155,38 @@ const BalanceScaleExercise: React.FC<BalanceScaleExerciseProps> = ({ difficulty,
       {feedback && (
         <div className={`mt-4 text-center text-lg font-semibold p-3 rounded-lg ${feedback === 'correct' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
           {feedback === 'correct' ? 'Correto! Você equilibrou a balança!' : 'Tente de novo! A matemática é prática.'}
+        </div>
+      )}
+
+      {feedback === 'incorrect' && problem && (
+        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-left text-sm text-slate-700">
+          <h3 className="font-bold text-base text-blue-700 mb-2">💡 Vamos resolver juntos!</h3>
+          <p className="mb-2">O objetivo é deixar o 'x' sozinho de um lado da balança. Para manter o equilíbrio, o que fazemos de um lado, temos que fazer do outro.</p>
+          <ol className="list-decimal list-inside space-y-2">
+            <li>
+              <strong>Equação Inicial:</strong> A balança nos mostra a equação:
+              <br />
+              <code className="bg-blue-100 p-1 rounded font-mono">{problem.a}x + {problem.b} = {problem.c}</code>
+            </li>
+            <li>
+              <strong>Remover os pesos '1':</strong> Primeiro, vamos tirar os <span className="font-bold">{problem.b}</span> pesos de valor '1' do lado esquerdo. Para manter o equilíbrio, também tiramos <span className="font-bold">{problem.b}</span> do lado direito.
+              <br />
+              <code className="bg-blue-100 p-1 rounded font-mono">{problem.c} - {problem.b} = {problem.c - problem.b}</code>
+            </li>
+            <li>
+              <strong>Equação Simplificada:</strong> Agora a balança mostra:
+              <br />
+              <code className="bg-blue-100 p-1 rounded font-mono">{problem.a}x = {problem.c - problem.b}</code>
+            </li>
+            <li>
+              <strong>Descobrir o valor de um 'x':</strong> Temos <span className="font-bold">{problem.a}</span> caixas 'x' que pesam juntas <span className="font-bold">{problem.c - problem.b}</span>. Para achar o peso de uma só caixa 'x', dividimos o peso total pelo número de caixas.
+              <br />
+              <code className="bg-blue-100 p-1 rounded font-mono">{problem.c - problem.b} / {problem.a} = {problem.solution}</code>
+            </li>
+            <li>
+              <strong>Resposta:</strong> Cada caixa 'x' pesa <span className="font-bold">{problem.solution}</span>.
+            </li>
+          </ol>
         </div>
       )}
     </div>

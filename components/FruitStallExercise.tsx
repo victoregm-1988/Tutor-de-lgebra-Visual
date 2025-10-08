@@ -114,7 +114,10 @@ const FruitStallExercise: React.FC<FruitStallExerciseProps> = ({ difficulty, onC
             <input 
               type="number"
               value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
+              onChange={(e) => {
+                setUserInput(e.target.value);
+                if (feedback) setFeedback(null);
+              }}
               onKeyDown={(e) => e.key === 'Enter' && handleCheckAnswer()}
               disabled={feedback === 'correct'}
               className="w-24 text-center text-lg p-2 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
@@ -135,6 +138,40 @@ const FruitStallExercise: React.FC<FruitStallExerciseProps> = ({ difficulty, onC
       {feedback && (
         <div className={`mt-4 text-center text-lg font-semibold p-3 rounded-lg ${feedback === 'correct' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
           {feedback === 'correct' ? 'Exato! Boa compra!' : 'Opa, o troco não vai bater. Tente de novo!'}
+        </div>
+      )}
+
+      {feedback === 'incorrect' && problem && (
+        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-left text-sm text-slate-700">
+          <h3 className="font-bold text-base text-blue-700 mb-2">💡 Calculando o preço das maçãs!</h3>
+          <p className="mb-2">O valor total da compra é a soma do preço de todas as sacolas de maçãs mais o preço do melão.</p>
+          <ol className="list-decimal list-inside space-y-2">
+            <li>
+              <strong>Equação da Compra:</strong> A compra pode ser representada pela equação:
+              <br />
+              <code className="bg-blue-100 p-1 rounded font-mono">{problem.a}x + {problem.b} = {problem.c}</code>
+              <br />
+              Onde 'x' é o preço de uma sacola de maçãs.
+            </li>
+            <li>
+              <strong>Descobrir o custo total das maçãs:</strong> Do total da compra (<span className="font-bold">R$ {problem.c}</span>), vamos subtrair o valor do melão (<span className="font-bold">R$ {problem.b}</span>).
+              <br />
+              <code className="bg-blue-100 p-1 rounded font-mono">{problem.c} - {problem.b} = {problem.c - problem.b}</code>
+            </li>
+            <li>
+              <strong>Equação Simplificada:</strong> Agora sabemos que as <span className="font-bold">{problem.a}</span> sacolas de maçãs custaram, juntas, <span className="font-bold">R$ {problem.c - problem.b}</span>.
+              <br />
+              <code className="bg-blue-100 p-1 rounded font-mono">{problem.a}x = {problem.c - problem.b}</code>
+            </li>
+            <li>
+              <strong>Descobrir o preço de uma sacola:</strong> Para achar o preço de uma única sacola, dividimos o custo total das maçãs pelo número de sacolas.
+              <br />
+              <code className="bg-blue-100 p-1 rounded font-mono">{problem.c - problem.b} / {problem.a} = {problem.solution}</code>
+            </li>
+            <li>
+              <strong>Resposta:</strong> Cada sacola de maçãs custou <span className="font-bold">R$ {problem.solution}</span>.
+            </li>
+          </ol>
         </div>
       )}
     </div>
